@@ -1,13 +1,23 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { Form, Input, Button, Checkbox, notification } from 'antd'
 import { fetchData } from '../common/fetchData'
-// import { useHistory } from 'react-router'
+import { sessionToken } from '../common/interfaces'
+import { useHistory } from 'react-router'
 
 export default function Login() {
   const [isLoading, setLoading] = useState(false)
-  const [data, setData] = useState({})
-  // const history = useHistory()
+  const [data, setData] = useState<sessionToken>({
+    token: localStorage.getItem('sessionToken'),
+  })
+  const history = useHistory()
+
+  useEffect(() => {
+    if (data.token) {
+      localStorage.setItem('sessionToken', data.token)
+      history.push('/admin')
+    }
+  })
 
   const onFinish = (values: any) => {
     const login = async () => {
@@ -20,7 +30,7 @@ export default function Login() {
           },
           body: JSON.stringify({
             email: values.username,
-            passowrd: values.password,
+            password: values.password,
           }),
           mode: 'cors',
         },
@@ -29,13 +39,11 @@ export default function Login() {
       )
     }
     login()
-    console.log(data)
   }
 
   const onFinishFailed = (errorInfo: any) => {
-    // console.log('Failed:', errorInfo)
     notification['error']({
-      message: '错误',
+      message: '内容不正确',
       description: errorInfo.errorFields[0].errors,
     })
     setLoading(false)

@@ -11,10 +11,13 @@ import { message } from 'antd'
  * @return {object} data 数据体
  */
 
-export const fetchData = async (url: string, config: object, setLoading?: Function, setData?: Function) => {
-  if (setLoading) {
-    setLoading(true)
-  }
+export const fetchData = async (
+  url: string,
+  config: object,
+  setLoading?: Function | false,
+  setData?: Function | false
+) => {
+  if (setLoading) setLoading(true)
 
   try {
     const response = await fetch(url, config)
@@ -29,28 +32,30 @@ export const fetchData = async (url: string, config: object, setLoading?: Functi
           message.error('请求的资源未找到！')
           break
         case 500:
-          message.error('服务器错误，服务器在处理请求的过程中发生了错误')
+          message.error('服务器在处理请求的过程中发生了错误')
           break
         default:
           message.error('未知错误，请求失败')
-          break
       }
     } else {
       const { code, msg, data } = await response.json()
-      if (code) {
-        message.error(msg)
-      } else {
-        if (msg) message.success(msg)
-        if (setData) {
-          setData(data)
-        }
+
+      switch (code) {
+        case 0:
+          if (msg) message.success(msg)
+          if (setData) setData(data)
+          break
+        case 10:
+          localStorage.clear()
+          message.warning(msg)
+          break
+        default:
+          message.error(msg)
       }
     }
   } catch (error) {
     message.error(`接口请求失败，请检查网络连接，如果问题依然存在，请联系管理员！${error}`)
   }
 
-  if (setLoading) {
-    setLoading(false)
-  }
+  if (setLoading) setLoading(false)
 }
