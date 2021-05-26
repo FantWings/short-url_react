@@ -9,6 +9,9 @@ export default withRouter((location) => (
       <Redirect to="/login" />
     </Route>
     <Route path="/login" component={Login} exact />
-    <Route path="/admin" component={Admin} exact />
+    <Route path="/admin" exact>
+      <Redirect to="/admin/dashboard" />
+    </Route>
+    <Route path="/admin" component={Admin} />
   </Switch>
 ))

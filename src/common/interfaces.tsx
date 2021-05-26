@@ -9,4 +9,5 @@ export interface UserInfo {
   qq?: string | null
   uuid?: string
   vip_vaild?: string
+  avatar?: string
 }

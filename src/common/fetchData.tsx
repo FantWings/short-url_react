@@ -51,6 +51,7 @@ export const fetchData = async (
           break
         default:
           message.error(msg)
+          break
       }
     }
   } catch (error) {
