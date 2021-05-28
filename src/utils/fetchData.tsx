@@ -39,7 +39,6 @@ export const fetchData = async (
       }
     } else {
       const { code, msg, data } = await response.json()
-
       switch (code) {
         case 0:
           if (msg) message.success(msg)

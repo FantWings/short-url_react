@@ -3,10 +3,12 @@ import { useHistory } from 'react-router'
 import { message, Avatar, Menu, Dropdown } from 'antd'
 import { PieChartOutlined, DesktopOutlined, SettingOutlined, UserOutlined, LoginOutlined } from '@ant-design/icons'
 import styled from 'styled-components'
-import { fetchData } from '../common/fetchData'
-import { UserInfo } from '../common/interfaces'
+import { fetchData } from '../utils/fetchData'
+import { UserInfo } from '../utils/interfaces'
 import { Route, Switch } from 'react-router-dom'
-import PageUrl from './panel/url'
+import PanelUrl from './panel/url'
+import PanelDashboard from './panel/dashboard'
+import PanelSettings from './panel/settings'
 
 export default function AdminPage() {
   const history = useHistory()
@@ -16,12 +18,6 @@ export default function AdminPage() {
 
   // 获取登录态
   const [sessionToken] = useState(localStorage.getItem('sessionToken'))
-
-  // 未登录跳转
-  // if (!sessionToken) {
-  //   message.warn('请重新登录！')
-  //   history.replace('/login')
-  // }
 
   useEffect(() => {
     const getUserInfo = async () => {
@@ -60,9 +56,11 @@ export default function AdminPage() {
 
   const avatarMenu = (
     <Menu>
-      <Menu.Item>
-        <LoginOutlined style={{ color: 'red' }} />
-        <span onClick={handleSignOut}>退出登录</span>
+      <Menu.Item onClick={handleSignOut}>
+        <span>
+          <LoginOutlined style={{ color: 'red' }} />
+          退出登录
+        </span>
       </Menu.Item>
     </Menu>
   )
@@ -70,7 +68,7 @@ export default function AdminPage() {
   return (
     <div>
       <Header>
-        <h2 id={'title'}>短链接管理</h2>
+        <h2 id={'title'}>AdminPanel</h2>
         <Dropdown overlay={avatarMenu} placement="bottomRight" arrow>
           <div id={'userInfo'}>
             <Avatar size={32} icon={<UserOutlined />} style={{ margin: '0 8px' }} src={data.avatar} />
@@ -99,14 +97,13 @@ export default function AdminPage() {
             </Menu.Item>
           </Menu>
         </div>
-        <div id={'container'}>
+        <PanelContainer>
           <Switch>
-            <Route path="/admin/profile" component={PageUrl} />
-            <Route path="/admin/dashboard" component={PageUrl} />
-            <Route path="/admin/url" component={PageUrl} />
-            <Route path="/admin/settings" component={PageUrl} />
+            <Route path="/admin/dashboard" component={PanelDashboard} />
+            <Route path="/admin/url" component={PanelUrl} />
+            <Route path="/admin/settings" component={PanelSettings} />
           </Switch>
-        </div>
+        </PanelContainer>
       </Body>
     </div>
   )
@@ -137,8 +134,12 @@ const Header = styled.div`
 const Body = styled.div`
   display: flex;
   flex-wrap: nowrap;
+  background-color: #f4f5f5;
+`
 
-  #container {
-    margin: 16px;
-  }
+const PanelContainer = styled.div`
+  margin: 12px;
+  background-color: #fff;
+  flex: 1;
+  padding: 12px;
 `

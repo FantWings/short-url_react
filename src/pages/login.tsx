@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { Form, Input, Button, Checkbox, notification } from 'antd'
-import { fetchData } from '../common/fetchData'
-import { sessionToken } from '../common/interfaces'
+import { fetchData } from '../utils/fetchData'
+import { sessionToken } from '../utils/interfaces'
 import { useHistory } from 'react-router'
+import { apiAuth } from '../utils/api'
 
 export default function Login() {
   const [isLoading, setLoading] = useState(false)
@@ -22,7 +23,7 @@ export default function Login() {
   const onFinish = (values: any) => {
     const login = async () => {
       await fetchData(
-        `http://127.0.0.1:5000/auth/signIn`,
+        `${apiAuth}/signIn`,
         {
           method: 'POST',
           headers: {
@@ -31,6 +32,7 @@ export default function Login() {
           body: JSON.stringify({
             email: values.username,
             password: values.password,
+            remember: values.remember,
           }),
           mode: 'cors',
         },
@@ -75,7 +77,7 @@ export default function Login() {
           </Form.Item>
 
           <Form.Item name="remember" valuePropName="checked">
-            <Checkbox>记住我</Checkbox>
+            <Checkbox>7天内记住我</Checkbox>
           </Form.Item>
 
           <Form.Item>
