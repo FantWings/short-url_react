@@ -3,12 +3,12 @@ import { useHistory } from 'react-router'
 import { message, Avatar, Menu, Dropdown } from 'antd'
 import { PieChartOutlined, DesktopOutlined, SettingOutlined, UserOutlined, LoginOutlined } from '@ant-design/icons'
 import styled from 'styled-components'
-import { fetchData } from '../utils/fetchData'
-import { UserInfo } from '../utils/interfaces'
+import { fetchData } from '../../utils/fetchData'
+import { UserInfo } from '../../utils/interfaces'
 import { Route, Switch } from 'react-router-dom'
-import PanelUrl from './panel/url'
-import PanelDashboard from './panel/dashboard'
-import PanelSettings from './panel/settings'
+import PanelUrl from './ManageUrl'
+import PanelDashboard from './ManageDashboard'
+import PanelSettings from './ManageSettings'
 
 export default function AdminPage() {
   const history = useHistory()

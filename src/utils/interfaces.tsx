@@ -19,3 +19,9 @@ export interface UrlList {
   vaild_time: number
   status: number
 }
+
+export interface Modals {
+  onFinish: Function
+  isModalVisible: boolean
+  setIsModalVisible: Function
+}
