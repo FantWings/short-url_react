@@ -24,4 +24,5 @@ export interface Modals {
   onFinish: Function
   isModalVisible: boolean
   setIsModalVisible: Function
+  urlId?: number
 }

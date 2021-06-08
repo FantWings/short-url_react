@@ -23,6 +23,7 @@ export default function PanelUrl() {
   const [loading, setLoading] = useState(false)
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [isModifyModalVisible, setIsModifyModalVisible] = useState(false)
+  const [urlId, setUrlId] = useState(0)
   const { Column } = Table
 
   useEffect(() => {
@@ -95,7 +96,7 @@ export default function PanelUrl() {
       />
       <Table dataSource={data} loading={loading} rowKey={'url_id'}>
         <Column
-          title="状态"
+          title="状态"
           dataIndex="status"
           key="status"
           render={(status, record: UrlList) => (
@@ -125,6 +126,7 @@ export default function PanelUrl() {
               <Button
                 type="primary"
                 onClick={() => {
+                  setUrlId(record.url_id)
                   setIsModifyModalVisible(true)
                 }}
               >
@@ -150,6 +152,7 @@ export default function PanelUrl() {
         onFinish={getUrlList}
         isModalVisible={isModifyModalVisible}
         setIsModalVisible={setIsModifyModalVisible}
+        urlId={urlId}
       />
     </div>
   )
@@ -174,9 +177,9 @@ function AddUrl(props: Modals) {
     </Select>
   )
 
-  const handleAddUrl = async (newurl: { prefix: string; url: string }) => {
-    if (newurl.url.length === 0) return message.error('地址不能为空')
-    if (newurl.url.match(':')) return message.error('地址格式不正确，请勿重复添加 http:// 或 https:// 前缀')
+  const handleAddUrl = async () => {
+    if (newUrl.url.length === 0) return message.error('地址不能为空')
+    if (newUrl.url.match(':')) return message.error('地址格式不正确，请勿重复添加 http:// 或 https:// 前缀')
 
     await fetchData(
       `${apiUrl}/add`,
@@ -187,7 +190,7 @@ function AddUrl(props: Modals) {
           token: localStorage.getItem('sessionToken'),
         },
         body: JSON.stringify({
-          url: newurl.prefix + newurl.url,
+          url: newUrl.prefix + newUrl.url,
         }),
       },
       setLoading,
@@ -195,7 +198,6 @@ function AddUrl(props: Modals) {
     )
 
     setIsModalVisible(!isModalVisible)
-    setNewUrl({ ...newurl, url: '' })
     onFinish()
   }
 
@@ -204,19 +206,20 @@ function AddUrl(props: Modals) {
       title="添加地址"
       visible={isModalVisible}
       onOk={() => {
-        handleAddUrl(newUrl)
+        handleAddUrl()
       }}
       onCancel={() => {
         setIsModalVisible(!isModalVisible)
       }}
       confirmLoading={loading}
+      destroyOnClose
     >
       <div style={{ marginBottom: 16 }}>
         <Input
           addonBefore={urlSelectBefore}
           onChange={(e) => setNewUrl({ ...newUrl, url: e.target.value })}
           value={newUrl.url}
-          onPressEnter={() => handleAddUrl(newUrl)}
+          onPressEnter={() => handleAddUrl()}
         />
       </div>
     </Modal>
@@ -225,41 +228,34 @@ function AddUrl(props: Modals) {
 
 function ModifyUrl(props: Modals) {
   const [loading, setLoading] = useState(false)
-  const [date, setDate] = useState<any>([])
+  const [date, setDate] = useState<any>([moment(), moment().add(1, 'days')])
   const [isPermemt, setIsPerment] = useState(true)
 
-  const { isModalVisible, setIsModalVisible, onFinish } = props
+  const { isModalVisible, setIsModalVisible, onFinish, urlId } = props
   const { RangePicker } = DatePicker
 
-  function handleOk() {
+  const handleOk = async () => {
     setLoading(true)
-    if (!isPermemt) {
-      if (date.length === 0) {
-        message.warn('请选择日期')
-        return setLoading(false)
-      }
-    }
-
-    // await fetchData(
-    //   `${apiUrl}/update?urlId=${id}&method=date`,
-    //   {
-    //     method: 'POST',
-    //     headers: {
-    //       'content-type': 'application/json',
-    //       token: localStorage.getItem('sessionToken'),
-    //     },
-    //     body: JSON.stringify({
-    //       url: newurl.prefix + newurl.url,
-    //     }),
-    //   },
-    //   setLoading,
-    //   undefined
-    // )
+    await fetchData(
+      `${apiUrl}/update?urlId=${urlId}&method=date`,
+      {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          token: localStorage.getItem('sessionToken'),
+        },
+        body: JSON.stringify({
+          permemt: isPermemt,
+          starttime: Number(moment(date[0]).format('X')),
+          endtime: Number(moment(date[1]).format('X')),
+        }),
+      },
+      setLoading,
+      undefined
+    )
 
     setLoading(false)
     setIsModalVisible(!isModalVisible)
-    setDate([])
-    setIsPerment(true)
     onFinish()
   }
 
@@ -274,6 +270,7 @@ function ModifyUrl(props: Modals) {
         setIsModalVisible(!isModalVisible)
       }}
       confirmLoading={loading}
+      destroyOnClose
     >
       <div style={{ marginBottom: 16 }}>
         <Radio.Group
