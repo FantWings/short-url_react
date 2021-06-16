@@ -16,7 +16,9 @@ export interface UrlList {
   original_url: string
   short_url: string
   url_id: number
-  vaild_time: number
+  starttime: number
+  endtime: number
+  permemt: boolean
   status: number
 }
 

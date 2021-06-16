@@ -7,16 +7,10 @@ import { message } from 'antd'
  * @param {string} url 请求地址
  * @param {object} config fetch高级配置
  * @param {funcion} setLoading Hooks设置加载状态的回调
- * @param {funcion} setData Hooks设置返回数据的回调
  * @return {object} data 数据体
  */
 
-export const fetchData = async (
-  url: string,
-  config: object,
-  setLoading?: Function | false,
-  setData?: Function | false
-) => {
+export const fetchData = async (url: string, config: object, setLoading?: Function | false) => {
   if (setLoading) setLoading(true)
 
   try {
@@ -39,11 +33,11 @@ export const fetchData = async (
       }
     } else {
       const { code, msg, data } = await response.json()
+      if (setLoading) setLoading(false)
       switch (code) {
         case 0:
           if (msg) message.success(msg)
-          if (setData) setData(data)
-          break
+          return data
         case 10:
           localStorage.clear()
           message.warning(msg)
@@ -54,8 +48,7 @@ export const fetchData = async (
       }
     }
   } catch (error) {
+    if (setLoading) setLoading(false)
     message.error(`接口请求失败，请检查网络连接，如果问题依然存在，请联系管理员！${error}`)
   }
-
-  if (setLoading) setLoading(false)
 }

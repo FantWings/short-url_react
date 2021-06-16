@@ -3,12 +3,12 @@ import { useHistory } from 'react-router'
 import { message, Avatar, Menu, Dropdown } from 'antd'
 import { PieChartOutlined, DesktopOutlined, SettingOutlined, UserOutlined, LoginOutlined } from '@ant-design/icons'
 import styled from 'styled-components'
-import { fetchData } from '../../utils/fetchData'
-import { UserInfo } from '../../utils/interfaces'
+import { fetchData } from '../utils/fetchData'
+import { UserInfo } from '../utils/interfaces'
 import { Route, Switch } from 'react-router-dom'
-import PanelUrl from './ManageUrl'
-import PanelDashboard from './ManageDashboard'
-import PanelSettings from './ManageSettings'
+import PanelUrl from './Url'
+import PanelDashboard from './Dashboard'
+import PanelSettings from './Settings'
 
 export default function AdminPage() {
   const history = useHistory()
@@ -21,17 +21,18 @@ export default function AdminPage() {
 
   useEffect(() => {
     const getUserInfo = async () => {
-      await fetchData(
-        `http://127.0.0.1:5000/user/userInfo`,
-        {
-          method: 'GET',
-          headers: {
-            'content-type': 'application/json',
-            token: sessionToken,
+      setData(
+        await fetchData(
+          `http://127.0.0.1:5000/user/userInfo`,
+          {
+            method: 'GET',
+            headers: {
+              'content-type': 'application/json',
+              token: sessionToken,
+            },
           },
-        },
-        undefined,
-        setData
+          undefined
+        )
       )
     }
     if (!sessionToken) {

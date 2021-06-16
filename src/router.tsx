@@ -1,7 +1,7 @@
 import { Route, withRouter, Switch, Redirect } from 'react-router-dom'
 
 import Login from './pages/login'
-import Admin from './pages/admin'
+import Admin from './pages/console'
 
 export default withRouter((location) => (
   <Switch>

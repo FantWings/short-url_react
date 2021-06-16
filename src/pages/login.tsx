@@ -22,22 +22,23 @@ export default function Login() {
 
   const onFinish = (values: any) => {
     const login = async () => {
-      await fetchData(
-        `${apiAuth}/signIn`,
-        {
-          method: 'POST',
-          headers: {
-            'content-type': 'application/json',
+      setData(
+        await fetchData(
+          `${apiAuth}/signIn`,
+          {
+            method: 'POST',
+            headers: {
+              'content-type': 'application/json',
+            },
+            body: JSON.stringify({
+              email: values.username,
+              password: values.password,
+              remember: values.remember,
+            }),
+            mode: 'cors',
           },
-          body: JSON.stringify({
-            email: values.username,
-            password: values.password,
-            remember: values.remember,
-          }),
-          mode: 'cors',
-        },
-        setLoading,
-        setData
+          setLoading
+        )
       )
     }
     login()
