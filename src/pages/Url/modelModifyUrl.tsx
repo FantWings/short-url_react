@@ -1,22 +1,30 @@
 import moment from 'moment'
 import { Modal, DatePicker, Radio } from 'antd'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { fetchData } from '../../utils/fetchData'
 import { apiUrlUpdate } from '../../utils/api'
 import { Modals } from '../../utils/interfaces'
 
 export default function ModifyUrl(props: Modals) {
-  const { isModalVisible, setIsModalVisible, onFinish, urlId } = props
+  const { isModalVisible, setIsModalVisible, onFinish, CurrentUrl } = props
   const [loading, setLoading] = useState(false)
-  const [date, setDate] = useState<any>([moment(), moment().add(1, 'days')])
+  const [date, setDate] = useState<any>([])
   const [isPermemt, setIsPerment] = useState(true)
 
   const { RangePicker } = DatePicker
+  const { url_id, permemt, starttime, endtime } = CurrentUrl
+
+  useEffect(() => {
+    console.log('读取URL状态：', permemt, starttime, endtime)
+    setIsPerment(permemt)
+    setDate([moment(starttime), moment(endtime)])
+  }, [permemt, starttime, endtime, url_id])
 
   const handleOk = async () => {
     setLoading(true)
+
     await fetchData(
-      `${apiUrlUpdate}?urlId=${urlId}&method=date`,
+      `${apiUrlUpdate}?urlId=${url_id}&method=date`,
       'POST',
       {
         token: localStorage.getItem('sessionToken'),
@@ -27,9 +35,10 @@ export default function ModifyUrl(props: Modals) {
         endtime: Number(moment(date[1]).format('X')),
       }
     )
-    onFinish()
+
     setLoading(false)
     setIsModalVisible(!isModalVisible)
+    onFinish()
   }
 
   return (
@@ -43,7 +52,6 @@ export default function ModifyUrl(props: Modals) {
         setIsModalVisible(!isModalVisible)
       }}
       confirmLoading={loading}
-      destroyOnClose
     >
       <div style={{ marginBottom: 16 }}>
         <Radio.Group

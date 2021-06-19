@@ -16,10 +16,9 @@ export const apiUrlUpdate = `${apiUrl}/update`
 // 验证
 export function AuthAPI() {
   const history = useHistory()
-
   // 登录函数
   const logIn = async (form: any) => {
-    const data: { token: string } = await fetchData(
+    await fetchData(
       `${apiAuth}/signIn`,
       'POST',
       {},
@@ -27,16 +26,19 @@ export function AuthAPI() {
         email: form.username,
         password: form.password,
       }
-    )
-    if (data) localStorage.setItem('sessionToken', data.token)
-    history.push('/admin')
+    ).then((data: { token: string }) => {
+      if (data !== undefined) {
+        localStorage.setItem('sessionToken', data.token)
+        history.push('/admin')
+      }
+    })
   }
-
   // 登出函数
   const logOut = async () => {
     await fetchData(`${apiAuth}/signOut`, 'DELETE', {
       token: localStorage.getItem('sessionToken'),
     })
+    localStorage.removeItem('sessionToken')
     history.push('/login')
   }
   return { logIn, logOut }
@@ -45,13 +47,15 @@ export function AuthAPI() {
 // 用户
 export function UserAPI() {
   // 获取用户信息
-  const getUserInfo = () => {
-    return fetchData(`${apiUser}/userInfo`, 'GET', { token: localStorage.getItem('sessionToken') })
+  const getUserInfo = async () => {
+    return fetchData(`${apiUser}/userInfo`, 'GET', {
+      token: localStorage.getItem('sessionToken'),
+    })
   }
 
   // 更新用户信息
   const updateUserInfo = (target: string, content: string) => {
-    fetchData(
+    return fetchData(
       `${apiUser}/userUpdate?target=${target}`,
       'POST',
       { token: localStorage.getItem('sessionToken') },

@@ -12,7 +12,9 @@ export default function PanelUrl() {
   const [loading, setLoading] = useState(false)
   const [isAddModalVisible, setIsAddModalVisible] = useState(false)
   const [isModifyModalVisible, setIsModifyModalVisible] = useState(false)
-  const [urlId, setUrlId] = useState(0)
+  const [CurrentUrl, setCurrentUrl] = useState({
+    url_id: 0,
+  })
   const { Column } = Table
 
   const getUrlList = async () => {
@@ -105,8 +107,8 @@ export default function PanelUrl() {
               <Button
                 type="primary"
                 onClick={() => {
-                  setUrlId(record.url_id)
                   setIsModifyModalVisible(true)
+                  setCurrentUrl(record)
                 }}
               >
                 修改
@@ -131,7 +133,7 @@ export default function PanelUrl() {
         onFinish={getUrlList}
         isModalVisible={isModifyModalVisible}
         setIsModalVisible={setIsModifyModalVisible}
-        urlId={urlId}
+        CurrentUrl={CurrentUrl}
       />
     </div>
   )

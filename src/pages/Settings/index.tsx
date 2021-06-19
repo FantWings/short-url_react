@@ -16,35 +16,27 @@ export default function PanelSettings() {
     avatar: '',
     username: '',
     active: false,
+    nick_name: '',
   })
 
   useEffect(() => {
     const { getUserInfo } = UserAPI()
-    getUserInfo().then((data) => setUserInfo(data))
+    getUserInfo().then((data) =>
+      setUserInfo((prev) => {
+        return { prev, ...data }
+      })
+    )
   }, [])
+
+  async function handleUpdateUserInfo(action: string, e: string) {
+    await updateUserInfo(action, e).then(() => {
+      setUserInfo({ ...userInfo, nick_name: e })
+    })
+  }
 
   return (
     <div>
       <PageHeader className="site-page-header" title="设置" />
-      <ItemContent>
-        <div className="itemKey">
-          <span className="title">昵称</span>
-          <span className="description">更改您的昵称</span>
-        </div>
-        <div className="itemValue">
-          <Paragraph
-            editable={{
-              tooltip: '点击修改',
-              onChange: (e) => {
-                setUserInfo({ ...userInfo, nick_name: e })
-                updateUserInfo('nickname', e)
-              },
-            }}
-          >
-            {userInfo.nick_name || '未设置'}
-          </Paragraph>
-        </div>
-      </ItemContent>
       <ItemContent>
         <div className="itemKey">
           <span className="title">头像</span>
@@ -61,20 +53,39 @@ export default function PanelSettings() {
       </ItemContent>
       <ItemContent>
         <div className="itemKey">
-          <span className="title">邮箱</span>
-          <span className="description">邮箱为您的初始注册邮箱，暂不支持修改</span>
-        </div>
-        <div className="itemValue">
-          <span>zhijun@furry.top</span>
-        </div>
-      </ItemContent>
-      <ItemContent>
-        <div className="itemKey">
           <span className="title">修改密码</span>
           <span className="description">修改密码点击此处</span>
         </div>
         <div className="itemValue">
           <Button type="primary">修改</Button>
+        </div>
+      </ItemContent>
+      <ItemContent>
+        <div className="itemKey">
+          <span className="title">昵称</span>
+          <span className="description">更改您的昵称</span>
+        </div>
+        <div className="itemValue">
+          <Paragraph
+            editable={{
+              tooltip: '点击修改',
+              onChange: (e) => {
+                handleUpdateUserInfo('nickname', e)
+              },
+            }}
+            style={{ margin: '0' }}
+          >
+            {userInfo.nick_name || '未设置'}
+          </Paragraph>
+        </div>
+      </ItemContent>
+      <ItemContent>
+        <div className="itemKey">
+          <span className="title">邮箱</span>
+          <span className="description">邮箱为您的初始注册邮箱，暂不支持修改</span>
+        </div>
+        <div className="itemValue">
+          <span>zhijun@furry.top</span>
         </div>
       </ItemContent>
       <ItemContent>
@@ -87,10 +98,10 @@ export default function PanelSettings() {
             editable={{
               tooltip: '点击修改',
               onChange: (e) => {
-                setUserInfo({ ...userInfo, phone: e })
-                updateUserInfo('phone', e)
+                handleUpdateUserInfo('mobile', e)
               },
             }}
+            style={{ margin: '0' }}
           >
             {userInfo.phone || '未绑定'}
           </Paragraph>

@@ -1,4 +1,4 @@
-import { message } from 'antd'
+import { message, notification } from 'antd'
 
 /**
  * Fetch封装 -
@@ -10,7 +10,7 @@ import { message } from 'antd'
  * @return {object} data 数据体
  */
 
-export const fetchData = async (url: string, method?: 'GET' | 'POST' | 'DELETE', headers?: object, body?: object) => {
+export async function fetchData(url: string, method?: 'GET' | 'POST' | 'DELETE', headers?: object, body?: object) {
   try {
     const response = await fetch(url, {
       method: method || 'GET',
@@ -20,8 +20,8 @@ export const fetchData = async (url: string, method?: 'GET' | 'POST' | 'DELETE',
       },
       body: JSON.stringify(body) || undefined,
     })
-    const { ok, status } = response
 
+    const { ok, status } = response
     if (!ok) {
       switch (status) {
         case 400:
@@ -42,16 +42,23 @@ export const fetchData = async (url: string, method?: 'GET' | 'POST' | 'DELETE',
         case 0:
           if (msg) message.success(msg)
           return data
-        case 10:
-          localStorage.clear()
-          message.warn({ content: '登录态过期，请重新登录', key: 'RequiredLogin' })
-          break
-        default:
+        case 1:
           message.error(msg)
-          break
+          return undefined
+        case 10:
+          localStorage.removeItem('sessionToken')
+          message.warn({ content: '登录态过期，请重新登录', key: 'RequiredLogin' })
+          return undefined
+        default:
+          message.warn(msg)
+          return undefined
       }
     }
   } catch (error) {
-    message.error(`接口请求失败，请检查网络连接，如果问题依然存在，请联系管理员！${error}`)
+    notification['error']({
+      message: '接口请求出现错误',
+      description: `请求路径：${url}， 错误原因：${error}`,
+      key: 'socketError',
+    })
   }
 }

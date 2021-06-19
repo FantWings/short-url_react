@@ -11,7 +11,7 @@ export interface UserInfo {
   qq?: string | null
   vip_vaild?: string
   avatar?: string | null
-  nick_name?: string | null
+  nick_name: string | null
 }
 
 export interface UrlList {
@@ -28,5 +28,5 @@ export interface Modals {
   onFinish: Function
   isModalVisible: boolean
   setIsModalVisible: Function
-  urlId?: number
+  CurrentUrl?: any
 }

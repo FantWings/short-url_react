@@ -5,7 +5,6 @@ import Admin from './pages'
 
 export default withRouter((location) => (
   <Switch>
-    {console.log(location)}
     <Route path="/" exact>
       <Redirect to="/login" />
     </Route>

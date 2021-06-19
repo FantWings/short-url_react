@@ -24,11 +24,16 @@ export default function AdminPage() {
     avatar: '',
     username: '',
     active: false,
+    nick_name: '',
   })
 
   useEffect(() => {
     const { getUserInfo } = UserAPI()
-    getUserInfo().then((data) => setUserInfo(data))
+    getUserInfo().then((data) =>
+      setUserInfo((prev) => {
+        return { ...prev, ...data }
+      })
+    )
   }, [])
 
   const avatarMenu = (
@@ -58,19 +63,18 @@ export default function AdminPage() {
       <Layout>
         <Sider width={200} className="site-layout-background">
           <Menu
-            defaultSelectedKeys={['1']}
-            defaultOpenKeys={['sub1']}
-            mode="vertical"
-            theme="dark"
+            defaultSelectedKeys={[history.location.pathname.split('/').reverse()[0]]}
+            mode="inline"
+            theme="light"
             style={{ height: 'calc(100vh - 64px)', borderRight: 0 }}
           >
-            <Menu.Item key="1" icon={<PieChartOutlined />} onClick={() => history.push('/admin/dashboard')}>
+            <Menu.Item key="dashboard" icon={<PieChartOutlined />} onClick={() => history.push('/admin/dashboard')}>
               统计
             </Menu.Item>
-            <Menu.Item key="2" icon={<DesktopOutlined />} onClick={() => history.push('/admin/url')}>
+            <Menu.Item key="url" icon={<DesktopOutlined />} onClick={() => history.push('/admin/url')}>
               URL管理
             </Menu.Item>
-            <Menu.Item key="3" icon={<SettingOutlined />} onClick={() => history.push('/admin/settings')}>
+            <Menu.Item key="settings" icon={<SettingOutlined />} onClick={() => history.push('/admin/settings')}>
               设置
             </Menu.Item>
           </Menu>

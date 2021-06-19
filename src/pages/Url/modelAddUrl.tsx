@@ -26,8 +26,8 @@ export default function AddUrl(props: Modals) {
   const handleAddUrl = async () => {
     if (newUrl.url.length === 0) return message.error('地址不能为空')
     if (newUrl.url.match(':')) return message.error('地址格式不正确，请勿重复添加 http:// 或 https:// 前缀')
-
     setLoading(true)
+
     await fetchData(
       `${apiUrlAdd}`,
       'POST',
@@ -38,6 +38,7 @@ export default function AddUrl(props: Modals) {
         url: newUrl.prefix + newUrl.url,
       }
     )
+
     setLoading(false)
     setIsModalVisible(!isModalVisible)
   }
