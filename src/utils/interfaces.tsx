@@ -3,13 +3,15 @@ export interface sessionToken {
 }
 
 export interface UserInfo {
-  active?: boolean
   email: string
+  username: string
+  uuid: string
+  active: boolean
   phone?: string | null
   qq?: string | null
-  uuid?: string
   vip_vaild?: string
-  avatar?: string
+  avatar?: string | null
+  nick_name?: string | null
 }
 
 export interface UrlList {

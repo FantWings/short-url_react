@@ -10,11 +10,16 @@ import { message } from 'antd'
  * @return {object} data 数据体
  */
 
-export const fetchData = async (url: string, config: object, setLoading?: Function | false) => {
-  if (setLoading) setLoading(true)
-
+export const fetchData = async (url: string, method?: 'GET' | 'POST' | 'DELETE', headers?: object, body?: object) => {
   try {
-    const response = await fetch(url, config)
+    const response = await fetch(url, {
+      method: method || 'GET',
+      headers: {
+        'content-type': 'application/json',
+        ...headers,
+      },
+      body: JSON.stringify(body) || undefined,
+    })
     const { ok, status } = response
 
     if (!ok) {
@@ -32,15 +37,14 @@ export const fetchData = async (url: string, config: object, setLoading?: Functi
           message.error('未知错误，请求失败')
       }
     } else {
-      const { code, msg, data } = await response.json()
-      if (setLoading) setLoading(false)
+      const { code, data, msg }: { code: number; data: any; msg: string } = await response.json()
       switch (code) {
         case 0:
           if (msg) message.success(msg)
           return data
         case 10:
           localStorage.clear()
-          message.warning(msg)
+          message.warn({ content: '登录态过期，请重新登录', key: 'RequiredLogin' })
           break
         default:
           message.error(msg)
@@ -48,7 +52,6 @@ export const fetchData = async (url: string, config: object, setLoading?: Functi
       }
     }
   } catch (error) {
-    if (setLoading) setLoading(false)
     message.error(`接口请求失败，请检查网络连接，如果问题依然存在，请联系管理员！${error}`)
   }
 }

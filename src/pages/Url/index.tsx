@@ -2,7 +2,7 @@ import moment from 'moment'
 import { PageHeader, Table, Space, Button, Popconfirm, Switch } from 'antd'
 import { useState, useEffect } from 'react'
 import { fetchData } from '../../utils/fetchData'
-import { apiUrl } from '../../utils/api'
+import { apiUrlDelete, apiUrlUpdate, apiUrlGet } from '../../utils/api'
 import { UrlList } from '../../utils/interfaces'
 import ModifyUrl from './modelModifyUrl'
 import AddUrl from './modelAddUrl'
@@ -15,50 +15,39 @@ export default function PanelUrl() {
   const [urlId, setUrlId] = useState(0)
   const { Column } = Table
 
-  useEffect(() => {
-    getUrlList()
-  }, [])
-
   const getUrlList = async () => {
+    setLoading(true)
     setData(
-      await fetchData(
-        `${apiUrl}/getLists`,
-        {
-          method: 'GET',
-          headers: {
-            'content-type': 'application/json',
-            token: localStorage.getItem('sessionToken'),
-          },
-        },
-        setLoading
-      )
+      await fetchData(`${apiUrlGet}`, 'GET', {
+        token: localStorage.getItem('sessionToken'),
+      })
     )
+    setLoading(false)
   }
 
+  useEffect(() => {
+    const f = async () => {
+      setLoading(true)
+      await getUrlList()
+      setLoading(false)
+    }
+    f()
+  }, [])
+
   const actionDelete = async (id: number) => {
-    await fetchData(
-      `${apiUrl}/delete?urlId=${id}`,
-      {
-        method: 'DELETE',
-        headers: {
-          'content-type': 'application/json',
-          token: localStorage.getItem('sessionToken'),
-        },
-      },
-      setLoading
-    )
+    setLoading(true)
+    await fetchData(`${apiUrlDelete}?urlId=${id}`, 'DELETE', { token: localStorage.getItem('sessionToken') })
     getUrlList()
+    setLoading(false)
   }
 
   const switchStatus = async (enable: boolean, id?: number) => {
-    await fetchData(`${apiUrl}/update?urlId=${id}&enable=${enable}`, {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        token: localStorage.getItem('sessionToken'),
-      },
+    setLoading(true)
+    await fetchData(`${apiUrlUpdate}?urlId=${id}&enable=${enable}`, 'POST', {
+      token: localStorage.getItem('sessionToken'),
     })
     getUrlList()
+    setLoading(false)
   }
 
   return (
@@ -86,7 +75,7 @@ export default function PanelUrl() {
           render={(status, record: UrlList) => (
             <Switch
               checkedChildren="开启"
-              unCheckedChildren={status === 5 ? '已过期' : '关闭'}
+              unCheckedChildren={status === 5 ? '无法操作' : '关闭'}
               defaultChecked={status === 5 ? false : status === 0 ? true : false}
               onChange={(enable) => switchStatus(enable, record.url_id)}
               disabled={status === 5}

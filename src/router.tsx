@@ -1,10 +1,11 @@
 import { Route, withRouter, Switch, Redirect } from 'react-router-dom'
 
 import Login from './pages/login'
-import Admin from './pages/console'
+import Admin from './pages'
 
 export default withRouter((location) => (
   <Switch>
+    {console.log(location)}
     <Route path="/" exact>
       <Redirect to="/login" />
     </Route>
@@ -13,5 +14,6 @@ export default withRouter((location) => (
       <Redirect to="/admin/dashboard" />
     </Route>
     <Route path="/admin" component={Admin} />
+    <Redirect to="/login" />
   </Switch>
 ))

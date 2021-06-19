@@ -2,7 +2,7 @@ import moment from 'moment'
 import { Modal, DatePicker, Radio } from 'antd'
 import { useState } from 'react'
 import { fetchData } from '../../utils/fetchData'
-import { apiUrl } from '../../utils/api'
+import { apiUrlUpdate } from '../../utils/api'
 import { Modals } from '../../utils/interfaces'
 
 export default function ModifyUrl(props: Modals) {
@@ -14,23 +14,21 @@ export default function ModifyUrl(props: Modals) {
   const { RangePicker } = DatePicker
 
   const handleOk = async () => {
+    setLoading(true)
     await fetchData(
-      `${apiUrl}/update?urlId=${urlId}&method=date`,
+      `${apiUrlUpdate}?urlId=${urlId}&method=date`,
+      'POST',
       {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          token: localStorage.getItem('sessionToken'),
-        },
-        body: JSON.stringify({
-          permemt: isPermemt,
-          starttime: Number(moment(date[0]).format('X')),
-          endtime: Number(moment(date[1]).format('X')),
-        }),
+        token: localStorage.getItem('sessionToken'),
       },
-      setLoading
+      {
+        permemt: isPermemt,
+        starttime: Number(moment(date[0]).format('X')),
+        endtime: Number(moment(date[1]).format('X')),
+      }
     )
     onFinish()
+    setLoading(false)
     setIsModalVisible(!isModalVisible)
   }
 

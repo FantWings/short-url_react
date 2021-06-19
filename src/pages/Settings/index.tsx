@@ -1,17 +1,62 @@
 import { PageHeader, Button, Avatar } from 'antd'
+import { useEffect } from 'react'
+import { useState } from 'react'
 import styled from 'styled-components'
+import { UserAPI } from '../../utils/api'
+import { UserInfo } from '../../utils/interfaces'
+import { UserOutlined } from '@ant-design/icons'
+import { Typography } from 'antd'
 
 export default function PanelSettings() {
+  const { Paragraph } = Typography
+  const { updateUserInfo } = UserAPI()
+  const [userInfo, setUserInfo] = useState<UserInfo>({
+    uuid: '',
+    email: 'loading',
+    avatar: '',
+    username: '',
+    active: false,
+  })
+
+  useEffect(() => {
+    const { getUserInfo } = UserAPI()
+    getUserInfo().then((data) => setUserInfo(data))
+  }, [])
+
   return (
     <div>
       <PageHeader className="site-page-header" title="设置" />
+      <ItemContent>
+        <div className="itemKey">
+          <span className="title">昵称</span>
+          <span className="description">更改您的昵称</span>
+        </div>
+        <div className="itemValue">
+          <Paragraph
+            editable={{
+              tooltip: '点击修改',
+              onChange: (e) => {
+                setUserInfo({ ...userInfo, nick_name: e })
+                updateUserInfo('nickname', e)
+              },
+            }}
+          >
+            {userInfo.nick_name || '未设置'}
+          </Paragraph>
+        </div>
+      </ItemContent>
       <ItemContent>
         <div className="itemKey">
           <span className="title">头像</span>
           <span className="description">更改您的头像</span>
         </div>
         <div className="itemValue">
-          <Avatar size={64} />
+          <Avatar
+            size={64}
+            src={userInfo.avatar || undefined}
+            style={{ backgroundColor: '#87d068' }}
+            icon={<UserOutlined />}
+          />
         </div>
       </ItemContent>
       <ItemContent>
@@ -38,16 +83,17 @@ export default function PanelSettings() {
           <span className="description">手机号码</span>
         </div>
         <div className="itemValue">
-          <Button type="primary">修改</Button>
-        </div>
-      </ItemContent>
-      <ItemContent>
-        <div className="itemKey">
-          <span className="title">用户名</span>
-          <span className="description">用户名为您的初始注册邮箱，暂不支持修改</span>
-        </div>
-        <div className="itemValue">
-          <span>zhijun@furry.top</span>
+          <Paragraph
+            editable={{
+              tooltip: '点击修改',
+              onChange: (e) => {
+                setUserInfo({ ...userInfo, phone: e })
+                updateUserInfo('phone', e)
+              },
+            }}
+          >
+            {userInfo.phone || '未绑定'}
+          </Paragraph>
         </div>
       </ItemContent>
     </div>

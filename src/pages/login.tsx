@@ -1,47 +1,18 @@
-import { useState, useEffect } from 'react'
 import styled from 'styled-components'
-import { Form, Input, Button, Checkbox, notification } from 'antd'
-import { fetchData } from '../utils/fetchData'
-import { sessionToken } from '../utils/interfaces'
-import { useHistory } from 'react-router'
-import { apiAuth } from '../utils/api'
+import { useState } from 'react'
+import { Form, Input, Button, notification } from 'antd'
+import { AuthAPI } from '../utils/api'
+import useLoginCheck from '../hooks/useLoginCheck'
 
 export default function Login() {
+  useLoginCheck()
   const [isLoading, setLoading] = useState(false)
-  const [data, setData] = useState<sessionToken>({
-    token: localStorage.getItem('sessionToken'),
-  })
-  const history = useHistory()
+  const { logIn } = AuthAPI()
 
-  useEffect(() => {
-    if (data.token) {
-      localStorage.setItem('sessionToken', data.token)
-      history.push('/admin')
-    }
-  })
-
-  const onFinish = (values: any) => {
-    const login = async () => {
-      setData(
-        await fetchData(
-          `${apiAuth}/signIn`,
-          {
-            method: 'POST',
-            headers: {
-              'content-type': 'application/json',
-            },
-            body: JSON.stringify({
-              email: values.username,
-              password: values.password,
-              remember: values.remember,
-            }),
-            mode: 'cors',
-          },
-          setLoading
-        )
-      )
-    }
-    login()
+  const handleLogin = async (form: any) => {
+    setLoading(true)
+    await logIn(form)
+    setLoading(false)
   }
 
   const onFinishFailed = (errorInfo: any) => {
@@ -51,6 +22,7 @@ export default function Login() {
     })
     setLoading(false)
   }
+
   return (
     <LoginContain>
       <SectionLogin>
@@ -58,7 +30,7 @@ export default function Login() {
         <Form
           name="basic"
           initialValues={{ remember: false }}
-          onFinish={onFinish}
+          onFinish={handleLogin}
           onFinishFailed={onFinishFailed}
           layout="vertical"
         >
@@ -72,15 +44,9 @@ export default function Login() {
           >
             <Input />
           </Form.Item>
-
           <Form.Item label="密码" name="password" rules={[{ required: true, message: '请正确填写密码' }]}>
             <Input.Password />
           </Form.Item>
-
-          <Form.Item name="remember" valuePropName="checked">
-            <Checkbox>7天内记住我</Checkbox>
-          </Form.Item>
-
           <Form.Item>
             <Button type="primary" htmlType="submit" block loading={isLoading}>
               登录
